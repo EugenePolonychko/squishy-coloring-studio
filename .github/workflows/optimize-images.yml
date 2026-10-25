@@ -1,0 +1,24 @@
+name: Optimize coloring images for Safari
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/optimize-images.yml'
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Extract illustrations from existing HTML
+        run: python scripts/extract_images.py
+      - name: Commit optimized game
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html images/
+          git diff --cached --quiet || (git commit -m "Load 12 illustrations as separate files for Safari" && git push)
